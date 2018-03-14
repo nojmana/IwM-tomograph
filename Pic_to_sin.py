@@ -1,6 +1,7 @@
+import Bresenham
+
 import numpy as np
 import math
-
 
 class Picture:
     def __init__(self, input_picture, sinogram):
@@ -43,6 +44,7 @@ class Transform:
         r = int((picture_size - 1) / 2)
         radians_start = math.radians(angle + 180 - self.width/2)
         radians_stop = math.radians(angle + 180 + self.width/2)
+        #calculate all detectors positions
         for i in np.linspace(radians_start, radians_stop, self.detectors_amount):
             x = round(r * math.cos(i * i) + x0, 0)
             y = round(r * math.sin(i * i) + y0, 0)
@@ -55,3 +57,9 @@ class Transform:
         all_detectors = []
         for i in range(0, 360, int(360/len(emitter_positions))):
             all_detectors.append(self.get_detectors_positions_for_current_angle(picture_size, i))
+        #join all emiter positions and detectors
+        all_positions = []
+        for i in range(len(emitter_positions)):
+            all_positions.append((emitter_positions[i], all_detectors[i]))
+        b = Bresenham.Bresenham()
+        b.algorithm(all_positions, self.detectors_amount)
