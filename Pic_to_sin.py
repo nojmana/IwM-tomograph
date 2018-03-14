@@ -1,0 +1,57 @@
+import numpy as np
+import math
+
+
+class Picture:
+    def __init__(self, input_picture, sinogram):
+        self.input_picture = input_picture
+        self.sinogram = sinogram
+
+
+class Pixel:
+    def __init__(self):
+        self.origin = 0
+        self.normalized = 0
+
+
+class Transform:
+    def __init__(self):
+        self.alpha = 2
+        self.detectors_amount = 5
+        self.width = 40
+
+    def get_emitter_positions(self, picture_size):
+        #calculate center and radius of the circle
+        x0 = picture_size / 2
+        y0 = picture_size / 2
+        r = int((picture_size - 1) / 2)
+        radians = math.radians(self.alpha)
+
+        #calculate all positions of emitter from 0 to 360 with alpha step
+        positions = []
+        for i in range(0, 360, self.alpha):
+            x = round(r * math.cos(i * radians) + x0, 0)
+            y = round(r * math.sin(i * radians) + y0, 0)
+            positions.append((int(x), int(y)))
+        return positions
+
+    def get_detectors_positions_for_current_angle(self, picture_size, angle):
+        detectors_positions = []
+        # calculate center and radius of the circle
+        x0 = picture_size / 2
+        y0 = picture_size / 2
+        r = int((picture_size - 1) / 2)
+        radians_start = math.radians(angle + 180 - self.width/2)
+        radians_stop = math.radians(angle + 180 + self.width/2)
+        for i in np.linspace(radians_start, radians_stop, self.detectors_amount):
+            x = round(r * math.cos(i * i) + x0, 0)
+            y = round(r * math.sin(i * i) + y0, 0)
+            detectors_positions.append((int(x), int(y)))
+        return detectors_positions
+
+    def make_sinogram(self, picture):
+        picture_size = len(picture[0])
+        emitter_positions = self.get_emitter_positions(picture_size)
+        all_detectors = []
+        for i in range(0, 360, int(360/len(emitter_positions))):
+            all_detectors.append(self.get_detectors_positions_for_current_angle(picture_size, i))
