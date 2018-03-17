@@ -44,12 +44,15 @@ class Example(Frame):
         elif picture_type == 'output':
             label1.place(x=800, y=200)
 
-    def change_parameters(self, parameter_type, value):
+    def change_parameters(self, parameter_type, value, label):
         if parameter_type == 'detectors':
             pts.detectors_amount=int(value)
+            label.config(text="Detectors amount = " + value)
         elif parameter_type == 'alpha':
+            label.config(text="Alpha = " + value)
             pts.alpha=int(value)
         elif parameter_type == 'width':
+            label.config(text="Width = " + value)
             pts.width = int(value)
         pic.sinogram = pts.make_sinogram(pic.input_picture)
         app.display_picture(Image.fromarray(pic.sinogram), 'sinogram')
@@ -65,21 +68,21 @@ if __name__ == '__main__':
     pts = Pic_to_sin.Transform()
 
     detectors_slider = Scale(root, from_=1, to=100, length=300, orient='horizontal',
-                             command=lambda value, name='detectors': app.change_parameters(name, value))
+                             command=lambda value, name='detectors': app.change_parameters(name, value, detectors_label))
     detectors_slider.set(20)
     detectors_slider.place(x=75, y=100)
     detectors_label = Label(root, text="Detectors amount", width=300)
     detectors_label.place(x=75, y=100)
 
     alpha_slider = Scale(root, from_=1, to=360, length=300, orient='horizontal',
-                         command=lambda value, name='alpha': app.change_parameters(name, value))
+                         command=lambda value, name='alpha': app.change_parameters(name, value, alpha_label))
     alpha_slider.set(180)
     alpha_slider.place(x=450, y=100)
-    alpha_label = Label(root, text="Alpha", width=300)
+    alpha_label = Label(root, text="Alpha = 180", width=300)
     alpha_label.place(x=450, y=100)
 
     width_slider = Scale(root, from_=0, to=100, length=300, orient='horizontal',
-                         command=lambda value, name='width': app.change_parameters(name, value))
+                         command=lambda value, name='width': app.change_parameters(name, value, width_label))
     width_slider.set(40)
     width_slider.place(x=825, y=100)
     width_label = Label(root, text="Width of detectors", width=300)
