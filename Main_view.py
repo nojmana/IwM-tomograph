@@ -74,9 +74,9 @@ if __name__ == '__main__':
     detectors_label = Label(root, text="Detectors amount", width=300)
     detectors_label.place(x=75, y=100)
 
-    alpha_slider = Scale(root, from_=1, to=360, length=300, orient='horizontal',
+    alpha_slider = Scale(root, from_=1, to=180, length=300, orient='horizontal',
                          command=lambda value, name='alpha': app.change_parameters(name, value, alpha_label))
-    alpha_slider.set(180)
+    alpha_slider.set(90)
     alpha_slider.place(x=450, y=100)
     alpha_label = Label(root, text="Alpha = 180", width=300)
     alpha_label.place(x=450, y=100)

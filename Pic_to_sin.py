@@ -30,7 +30,7 @@ class Transform:
 
         #calculate all positions of emitter from 0 to 360 with alpha step
         positions = []
-        for i in range(0, 360, self.alpha):
+        for i in range(0, int(math.floor(360 / self.alpha))):
             x = round(r * math.cos(i * radians) + x0, 0)
             y = round(r * math.sin(i * radians) + y0, 0)
             positions.append((int(x), int(y)))
@@ -55,7 +55,7 @@ class Transform:
         picture_size = len(picture[0])
         emitter_positions = self.get_emitter_positions(picture_size)
         all_detectors = []
-        for i in range(0, 360, int(360/len(emitter_positions))):
+        for i in np.linspace(0.0, 360.0, len(emitter_positions), False):
             all_detectors.append(self.get_detectors_positions_for_current_angle(picture_size, i))
         #join all emiter positions and detectors
         all_positions = []

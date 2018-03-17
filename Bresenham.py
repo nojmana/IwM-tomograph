@@ -44,7 +44,6 @@ class Bresenham:
                 lines.append(line)
             all_lines.append(lines)
 
-
         #show all lines
         picture2 = copy.copy(picture)
         for i in range(len(picture)):
