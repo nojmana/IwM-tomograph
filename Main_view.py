@@ -3,7 +3,7 @@ import Pic_to_sin
 from tkinter import *
 from tkinter.ttk import Frame, Button, Label
 from PIL import Image, ImageTk
-from skimage import data, io
+from skimage import io
 from skimage.color import rgb2gray
 
 
@@ -46,53 +46,50 @@ class Example(Frame):
 
     def change_parameters(self, parameter_type, value, label):
         if parameter_type == 'detectors':
-            pts.detectors_amount=int(value)
+            pts_transformation.detectors_amount=int(value)
             label.config(text="Detectors amount = " + value)
         elif parameter_type == 'alpha':
             label.config(text="Alpha = " + value)
-            pts.alpha=int(value)
+            pts_transformation.alpha=int(value)
         elif parameter_type == 'width':
             label.config(text="Width = " + value)
-            pts.width = int(value)
-        pic.sinogram = pts.make_sinogram(pic.input_picture)
-        app.display_picture(Image.fromarray(pic.sinogram), 'sinogram')
+            pts_transformation.width = int(value)
+        picture.sinogram = pts_transformation.make_sinogram(picture.input_picture)
+        app.display_picture(Image.fromarray(picture.sinogram), 'sinogram')
 
 
 if __name__ == '__main__':
     root = Tk()
     app = Example()
+    slider_length = 300
 
-    pic = Pic_to_sin.Picture
-    pic.input_picture = rgb2gray(io.imread("pictures/01.png"))
-    app.display_picture(Image.fromarray(pic.input_picture), 'input')
-    pts = Pic_to_sin.Transform()
+    picture = Pic_to_sin.Picture
+    picture.input_picture = rgb2gray(io.imread("pictures/01.png"))
+    app.display_picture(Image.fromarray(picture.input_picture), 'input')
+    pts_transformation = Pic_to_sin.Transform()
 
-    detectors_slider = Scale(root, from_=1, to=100, length=300, orient='horizontal',
+    detectors_slider = Scale(root, from_=1, to=100, length=slider_length, orient='horizontal',
                              command=lambda value, name='detectors': app.change_parameters(name, value, detectors_label))
     detectors_slider.set(20)
     detectors_slider.place(x=75, y=100)
-    detectors_label = Label(root, text="Detectors amount", width=300)
+    detectors_label = Label(root, width=slider_length)
     detectors_label.place(x=75, y=100)
 
-    alpha_slider = Scale(root, from_=1, to=180, length=300, orient='horizontal',
+    alpha_slider = Scale(root, from_=1, to=180, length=slider_length, orient='horizontal',
                          command=lambda value, name='alpha': app.change_parameters(name, value, alpha_label))
     alpha_slider.set(90)
-    alpha_slider.place(x=450, y=100)
-    alpha_label = Label(root, text="Alpha = 180", width=300)
-    alpha_label.place(x=450, y=100)
+    alpha_slider.place(x=75*2+slider_length, y=100)
+    alpha_label = Label(root, width=slider_length)
+    alpha_label.place(x=75*2+slider_length, y=100)
 
-    width_slider = Scale(root, from_=0, to=100, length=300, orient='horizontal',
+    width_slider = Scale(root, from_=0, to=500, length=slider_length, orient='horizontal',
                          command=lambda value, name='width': app.change_parameters(name, value, width_label))
     width_slider.set(40)
-    width_slider.place(x=825, y=100)
-    width_label = Label(root, text="Width of detectors", width=300)
-    width_label.place(x=825, y=100)
+    width_slider.place(x=75*3+slider_length*2, y=100)
+    width_label = Label(root, width=slider_length)
+    width_label.place(x=75*3+slider_length*2, y=100)
 
-    pic.sinogram = pts.make_sinogram(pic.input_picture)
-    app.display_picture(Image.fromarray(pic.sinogram), 'sinogram')
+    picture.sinogram = pts_transformation.make_sinogram(picture.input_picture)
+    app.display_picture(Image.fromarray(picture.sinogram), 'sinogram')
 
     root.mainloop()
-
-
-
-
