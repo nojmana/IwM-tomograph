@@ -17,9 +17,9 @@ class Pixel:
 
 class Transform:
     def __init__(self):
-        self.alpha = 2
-        self.detectors_amount = 5
-        self.width = 40
+        self.alpha = 90
+        self.detectors_amount = 2
+        self.width = 180
 
     def get_emitter_positions(self, picture_size):
         #calculate center and radius of the circle
@@ -62,4 +62,5 @@ class Transform:
         for i in range(len(emitter_positions)):
             all_positions.append((emitter_positions[i], all_detectors[i]))
         b = Bresenham.Bresenham()
-        b.algorithm(all_positions, self.detectors_amount)
+        sinogram = b.algorithm(all_positions, self.detectors_amount, picture)
+        return sinogram
