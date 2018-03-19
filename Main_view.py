@@ -64,7 +64,7 @@ if __name__ == '__main__':
     slider_length = 300
 
     picture = Pic_to_sin.Picture
-    picture.input_picture = rgb2gray(io.imread("pictures/01.png"))
+    picture.input_picture = rgb2gray(io.imread("pictures/02.png"))
     app.display_picture(Image.fromarray(picture.input_picture), 'input')
     pts_transformation = Pic_to_sin.Transform()
 
@@ -82,7 +82,7 @@ if __name__ == '__main__':
     alpha_label = Label(root, width=slider_length)
     alpha_label.place(x=75*2+slider_length, y=100)
 
-    width_slider = Scale(root, from_=0, to=500, length=slider_length, orient='horizontal',
+    width_slider = Scale(root, from_=0, to=360, length=slider_length, orient='horizontal',
                          command=lambda value, name='width': app.change_parameters(name, value, width_label))
     width_slider.set(40)
     width_slider.place(x=75*3+slider_length*2, y=100)

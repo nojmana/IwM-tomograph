@@ -46,8 +46,8 @@ class Transform:
         radians_stop = math.radians(angle + 180 + self.width/2)
         #calculate all detectors positions
         for i in np.linspace(radians_start, radians_stop, self.detectors_amount):
-            x = round(r * math.cos(i * i) + x0, 0)
-            y = round(r * math.sin(i * i) + y0, 0)
+            x = round(r * math.cos(i) + x0, 0)
+            y = round(r * math.sin(i) + y0, 0)
             detectors_positions.append((int(x), int(y)))
         return detectors_positions
 

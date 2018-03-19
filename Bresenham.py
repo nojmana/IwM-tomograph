@@ -78,7 +78,7 @@ class Bresenham:
     def algorithm(self, data, detectors_amount, picture):
         all_lines = self.generate_all_lines(data, detectors_amount)
         all_averages = self.generate_avgs_of_lines(all_lines, picture)
-        sinogram = np.zeros((detectors_amount, len(data))) #sinogram will be matrix of size emiters_positions x detectors_amount
+        sinogram = np.ones((detectors_amount, len(data))) #sinogram will be matrix of size emiters_positions x detectors_amount
         for x in range(len(all_averages)):
             for y in range(len(all_averages[x])):
                 sinogram[y][x] = all_averages[x][y]
