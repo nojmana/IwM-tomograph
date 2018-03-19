@@ -70,21 +70,21 @@ if __name__ == '__main__':
 
     detectors_slider = Scale(root, from_=1, to=100, length=slider_length, orient='horizontal',
                              command=lambda value, name='detectors': app.change_parameters(name, value, detectors_label))
-    detectors_slider.set(20)
+    detectors_slider.set(70)
     detectors_slider.place(x=75, y=100)
     detectors_label = Label(root, width=slider_length)
     detectors_label.place(x=75, y=100)
 
     alpha_slider = Scale(root, from_=1, to=180, length=slider_length, orient='horizontal',
                          command=lambda value, name='alpha': app.change_parameters(name, value, alpha_label))
-    alpha_slider.set(90)
+    alpha_slider.set(10)
     alpha_slider.place(x=75*2+slider_length, y=100)
     alpha_label = Label(root, width=slider_length)
     alpha_label.place(x=75*2+slider_length, y=100)
 
     width_slider = Scale(root, from_=0, to=360, length=slider_length, orient='horizontal',
                          command=lambda value, name='width': app.change_parameters(name, value, width_label))
-    width_slider.set(40)
+    width_slider.set(360)
     width_slider.place(x=75*3+slider_length*2, y=100)
     width_label = Label(root, width=slider_length)
     width_label.place(x=75*3+slider_length*2, y=100)
