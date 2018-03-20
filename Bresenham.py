@@ -72,7 +72,8 @@ class Bresenham:
         maximum = np.amax(sinogram)
         for i in range(len(sinogram)):
             for j in range(len(sinogram[i])):
-                sinogram[i][j] = round(sinogram[i][j] / maximum * 255)
+                if maximum != 0:
+                    sinogram[i][j] = round(sinogram[i][j] / maximum * 255)
         return sinogram
 
     def algorithm(self, data, detectors_amount, picture):
