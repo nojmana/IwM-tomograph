@@ -1,6 +1,7 @@
 import Pic_to_sin
 
 from tkinter import *
+from tkinter import filedialog
 from tkinter.ttk import Frame, Button, Label
 from PIL import Image, ImageTk
 from skimage import io
@@ -11,6 +12,7 @@ class MainWindow(Frame):
 
     def __init__(self, file):
         super().__init__()
+        self.var_checkbox = IntVar()
         self.init_ui()
 
         self.input_picture = rgb2gray(io.imread(file))
@@ -28,8 +30,7 @@ class MainWindow(Frame):
         y = (self.master.winfo_screenheight() - h) / 2
         self.master.geometry('%dx%d+%d+%d' % (w, h, x, y))
 
-    def open_file(self):
-        from tkinter import filedialog
+    def browse(self):
         file = filedialog.askopenfilename()
         self.load_images(file)
 
@@ -38,11 +39,24 @@ class MainWindow(Frame):
         self.pack(fill=BOTH, expand=1)
         self.center_window()
 
-        quit_button = Button(self, text="Quit", command=self.quit)
-        quit_button.place(x=1100, y=20)
+        self.quit_button = Button(self, text="Quit", command=self.quit)
+        self.quit_button.place(x=1100, y=20)
 
-        browse_button = Button(self, text="Browse file", command=self.open_file)
-        browse_button.place(x=1000, y=20)
+        self.browse_button = Button(self, text="Browse file", command=self.browse)
+        self.browse_button.place(x=1000, y=20)
+
+        self.refresh_button = Button(self, text="Refresh", command=self.refresh)
+        self.refresh_button.place(x=900, y=20)
+
+        self.checkbox = Checkbutton(self, text="Auto-refresh", variable=self.var_checkbox, command=self.auto_refresh)
+        self.checkbox.place(x=790, y=20)
+
+    def auto_refresh(self):
+        if self.var_checkbox.get():
+            self.refresh()
+            self.refresh_button['state'] = 'disabled'
+        else:
+            self.refresh_button['state'] = 'normal'
 
     def display_picture(self, picture, picture_type):
         width = 300
@@ -50,14 +64,14 @@ class MainWindow(Frame):
         height = int((float(picture.size[0] * float(width_percent))))
         resized_picture = picture.resize((width, height), Image.ANTIALIAS)
         resized_picture = ImageTk.PhotoImage(resized_picture)
-        label1 = Label(self, image=resized_picture)
-        label1.image = resized_picture
+        label = Label(self, image=resized_picture)
+        label.image = resized_picture
         if picture_type == 'input':
-            label1.place(x=100, y=200)
+            label.place(x=100, y=200)
         elif picture_type == 'sinogram':
-            label1.place(x=450, y=200)
+            label.place(x=450, y=200)
         elif picture_type == 'output':
-            label1.place(x=800, y=200)
+            label.place(x=800, y=200)
 
     def change_parameters(self, parameter_type, value, label):
         if parameter_type == 'detectors':
@@ -69,21 +83,22 @@ class MainWindow(Frame):
         elif parameter_type == 'width':
             label.config(text="Width = " + value)
             self.pts_transformation.width = int(value)
+        if self.var_checkbox.get():
+            self.refresh()
+
+    def refresh(self):
         self.sinogram = self.pts_transformation.make_sinogram(self.input_picture)
-        app.display_picture(Image.fromarray(self.sinogram), 'sinogram')
+        self.display_picture(Image.fromarray(self.sinogram), 'sinogram')
 
     def load_images(self, file):
         self.input_picture = rgb2gray(io.imread(file))
         self.display_picture(Image.fromarray(self.input_picture), 'input')
-
-        self.pts_transformation = Pic_to_sin.Transform()
-        self.sinogram = self.pts_transformation.make_sinogram(self.input_picture)
-        self.display_picture(Image.fromarray(self.sinogram), 'sinogram')
+        self.refresh()
 
 
 if __name__ == '__main__':
     root = Tk()
-    app = MainWindow("pictures/02.png")
+    app = MainWindow("pictures/01.png")
     slider_length = 300
 
     detectors_slider = Scale(root, from_=1, to=100, length=slider_length, orient='horizontal',

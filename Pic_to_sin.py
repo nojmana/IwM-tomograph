@@ -1,12 +1,6 @@
-import Bresenham
+from Bresenham import Bresenham
 import numpy as np
 import math
-
-
-class Pixel:
-    def __init__(self):
-        self.origin = 0
-        self.normalized = 0
 
 
 class Transform:
@@ -55,6 +49,6 @@ class Transform:
         all_positions = []
         for i in range(len(emitter_positions)):
             all_positions.append((emitter_positions[i], all_detectors[i]))
-        b = Bresenham.Bresenham()
-        sinogram = b.algorithm(all_positions, self.detectors_amount, picture)
+        #b = Bresenham.Bresenham()
+        sinogram = Bresenham.algorithm(all_positions, self.detectors_amount, picture)
         return sinogram

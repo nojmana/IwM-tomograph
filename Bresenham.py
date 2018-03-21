@@ -1,8 +1,10 @@
 import numpy as np
 
+
 class Bresenham:
 
-    def generate_line(self, x1, y1, x2, y2):
+    @staticmethod
+    def generate_line(x1, y1, x2, y2):
         kx = 1 if x1 <= x2 else -1
         ky = 1 if y1 <= y2 else -1
 
@@ -31,19 +33,21 @@ class Bresenham:
                 line.append([x1, y1])
         return line
 
-    def generate_all_lines(self, data, detectors_amount):
+    @staticmethod
+    def generate_all_lines( data, detectors_amount):
         emitter_positions = []
         for i in range(len(data)):  # iterate over all emitter's positions
             detectors = []
             emitter = data[i][0]
             for j in range(detectors_amount):  # iterate over all detectors
                 detector = data[i][1][j]
-                line = self.generate_line(emitter[0], emitter[1], detector[0], detector[1])
+                line = Bresenham.generate_line(emitter[0], emitter[1], detector[0], detector[1])
                 detectors.append(line)
             emitter_positions.append(detectors)
         return emitter_positions
 
-    def generate_avgs_of_lines(self, all_lines, picture):
+    @staticmethod
+    def generate_avgs_of_lines(all_lines, picture):
         all_avgs = []
         for lines in all_lines: #iterate over all emitter positions
             avg = []
@@ -56,7 +60,8 @@ class Bresenham:
             all_avgs.append(avg)
         return all_avgs
 
-    def show_rays(self, picture, all_lines):
+    @staticmethod
+    def show_rays(picture, all_lines):
         for line in all_lines:
             for i in range(len(picture)):
                 for j in range(len(picture)):
@@ -68,7 +73,8 @@ class Bresenham:
                         picture[x][y] = 255
         return picture
 
-    def normalize_sinogram(self, sinogram):
+    @staticmethod
+    def normalize_sinogram(sinogram):
         maximum = np.amax(sinogram)
         for i in range(len(sinogram)):
             for j in range(len(sinogram[i])):
@@ -76,14 +82,15 @@ class Bresenham:
                     sinogram[i][j] = round(sinogram[i][j] / maximum * 255)
         return sinogram
 
-    def algorithm(self, data, detectors_amount, picture):
-        all_lines = self.generate_all_lines(data, detectors_amount)
-        all_averages = self.generate_avgs_of_lines(all_lines, picture)
+    @staticmethod
+    def algorithm(data, detectors_amount, picture):
+        all_lines = Bresenham.generate_all_lines(data, detectors_amount)
+        all_averages = Bresenham.generate_avgs_of_lines(all_lines, picture)
         sinogram = np.ones((detectors_amount, len(data))) #sinogram will be matrix of size emiters_positions x detectors_amount
         for x in range(len(all_averages)):
             for y in range(len(all_averages[x])):
                 sinogram[y][x] = all_averages[x][y]
 
-        sinogram = self.normalize_sinogram(sinogram)
+        sinogram = Bresenham.normalize_sinogram(sinogram)
         #return self.show_rays(picture, all_lines)
         return sinogram
