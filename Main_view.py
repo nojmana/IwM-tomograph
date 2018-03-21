@@ -7,11 +7,18 @@ from skimage import io
 from skimage.color import rgb2gray
 
 
-class Example(Frame):
+class MainWindow(Frame):
 
-    def __init__(self):
+    def __init__(self, file):
         super().__init__()
         self.init_ui()
+
+        self.input_picture = rgb2gray(io.imread(file))
+        self.display_picture(Image.fromarray(self.input_picture), 'input')
+
+        self.pts_transformation = Pic_to_sin.Transform()
+        self.sinogram = self.pts_transformation.make_sinogram(self.input_picture)
+        self.display_picture(Image.fromarray(self.sinogram), 'sinogram')
 
     def center_window(self):
         w = 1200
@@ -21,13 +28,21 @@ class Example(Frame):
         y = (self.master.winfo_screenheight() - h) / 2
         self.master.geometry('%dx%d+%d+%d' % (w, h, x, y))
 
+    def open_file(self):
+        from tkinter import filedialog
+        file = filedialog.askopenfilename()
+        self.load_images(file)
+
     def init_ui(self):
         self.master.title("Tomograph")
-        self.pack(fill = BOTH, expand=1)
+        self.pack(fill=BOTH, expand=1)
         self.center_window()
 
         quit_button = Button(self, text="Quit", command=self.quit)
         quit_button.place(x=1100, y=20)
+
+        browse_button = Button(self, text="Browse file", command=self.open_file)
+        browse_button.place(x=1000, y=20)
 
     def display_picture(self, picture, picture_type):
         width = 300
@@ -46,27 +61,30 @@ class Example(Frame):
 
     def change_parameters(self, parameter_type, value, label):
         if parameter_type == 'detectors':
-            pts_transformation.detectors_amount=int(value)
+            self.pts_transformation.detectors_amount=int(value)
             label.config(text="Detectors amount = " + value)
         elif parameter_type == 'alpha':
             label.config(text="Alpha = " + value)
-            pts_transformation.alpha=int(value)
+            self.pts_transformation.alpha=int(value)
         elif parameter_type == 'width':
             label.config(text="Width = " + value)
-            pts_transformation.width = int(value)
-        picture.sinogram = pts_transformation.make_sinogram(picture.input_picture)
-        app.display_picture(Image.fromarray(picture.sinogram), 'sinogram')
+            self.pts_transformation.width = int(value)
+        self.sinogram = self.pts_transformation.make_sinogram(self.input_picture)
+        app.display_picture(Image.fromarray(self.sinogram), 'sinogram')
+
+    def load_images(self, file):
+        self.input_picture = rgb2gray(io.imread(file))
+        self.display_picture(Image.fromarray(self.input_picture), 'input')
+
+        self.pts_transformation = Pic_to_sin.Transform()
+        self.sinogram = self.pts_transformation.make_sinogram(self.input_picture)
+        self.display_picture(Image.fromarray(self.sinogram), 'sinogram')
 
 
 if __name__ == '__main__':
     root = Tk()
-    app = Example()
+    app = MainWindow("pictures/02.png")
     slider_length = 300
-
-    picture = Pic_to_sin.Picture
-    picture.input_picture = rgb2gray(io.imread("pictures/02.png"))
-    app.display_picture(Image.fromarray(picture.input_picture), 'input')
-    pts_transformation = Pic_to_sin.Transform()
 
     detectors_slider = Scale(root, from_=1, to=100, length=slider_length, orient='horizontal',
                              command=lambda value, name='detectors': app.change_parameters(name, value, detectors_label))
@@ -88,8 +106,5 @@ if __name__ == '__main__':
     width_slider.place(x=75*3+slider_length*2, y=100)
     width_label = Label(root, width=slider_length)
     width_label.place(x=75*3+slider_length*2, y=100)
-
-    picture.sinogram = pts_transformation.make_sinogram(picture.input_picture)
-    app.display_picture(Image.fromarray(picture.sinogram), 'sinogram')
 
     root.mainloop()

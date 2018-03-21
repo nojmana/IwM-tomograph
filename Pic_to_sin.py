@@ -1,12 +1,6 @@
 import Bresenham
-
 import numpy as np
 import math
-
-class Picture:
-    def __init__(self, input_picture, sinogram):
-        self.input_picture = input_picture
-        self.sinogram = sinogram
 
 
 class Pixel:
