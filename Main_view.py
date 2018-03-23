@@ -121,7 +121,6 @@ class MainWindow(Frame):
     def refresh(self):
         self.sinogram = self.pts_transformation.make_sinogram(self.input_picture)
         self.display_picture(Image.fromarray(self.sinogram), 'sinogram')
-        print(len(self.input_picture), len(self.sinogram), len(self.sinogram[0]))
 
         self.restored_picture = self.pts_transformation.restore_picture(self.sinogram, len(self.input_picture))
         self.display_picture(Image.fromarray(self.restored_picture), 'output')

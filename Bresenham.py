@@ -1,5 +1,5 @@
 import numpy as np
-
+from skimage import filters
 
 class Bresenham:
 
@@ -63,13 +63,12 @@ class Bresenham:
 
     @staticmethod
     def generate_picture(all_lines, sinogram, picture_size):
-        picture = np.zeros((picture_size, picture_size))
+        picture = np.ones((picture_size, picture_size))
         counter = np.zeros((picture_size, picture_size))
         for i, lines in enumerate(all_lines): #iterate over all emitter positions
             for j, line in enumerate(lines): #iterate over all detectors
                 for x, y in line: #add value from sinogram to every pixel of line
                     picture[x][y] += sinogram[j][i]
-                    counter[x][y] += 1
         for i in range(len(counter)):
             for j in range(len(counter[i])):
                 if counter[i][j] != 0:
@@ -99,6 +98,15 @@ class Bresenham:
         return data
 
     @staticmethod
+    def filter_normalize(img, perc=1):
+        max = np.percentile(img, 100-perc)
+        min = np.percentile(img, perc)
+        norm = (img - min) / (max - min)
+        norm[norm[:,:] > 255] = 255
+        norm[norm[:,:] < 0] = 0
+        return norm
+
+    @staticmethod
     def algorithm(all_positions, detectors_amount, picture):
         all_lines = Bresenham.generate_all_lines(all_positions)
         all_averages = Bresenham.generate_avgs_of_lines(all_lines, picture)
@@ -115,4 +123,8 @@ class Bresenham:
     def inverse_algorithm(all_positions, sinogram, picture_size):
         all_lines = Bresenham.generate_all_lines(all_positions)
         picture = Bresenham.generate_picture(all_lines, sinogram, picture_size)
-        return Bresenham.normalize(picture)
+        picture = picture ** 1.3
+        picture = filters.gaussian(picture, sigma=1)
+        picture = Bresenham.filter_normalize(picture, perc=20)
+        picture = Bresenham.normalize(picture)
+        return picture
