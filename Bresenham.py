@@ -34,13 +34,14 @@ class Bresenham:
         return line
 
     @staticmethod
-    def generate_all_lines( data, detectors_amount):
+    def generate_all_lines(position):
         emitter_positions = []
-        for i in range(len(data)):  # iterate over all emitter's positions
+        for i in range(len(position)):  # iterate over all emitter's positions
             detectors = []
-            emitter = data[i][0]
+            emitter = position[i].emitter_position
+            detectors_amount = len(position[i].detectors)
             for j in range(detectors_amount):  # iterate over all detectors
-                detector = data[i][1][j]
+                detector = position[i].detectors[j]
                 line = Bresenham.generate_line(emitter[0], emitter[1], detector[0], detector[1])
                 detectors.append(line)
             emitter_positions.append(detectors)
@@ -61,6 +62,21 @@ class Bresenham:
         return all_avgs
 
     @staticmethod
+    def generate_picture(all_lines, sinogram, picture_size):
+        picture = np.zeros((picture_size, picture_size))
+        counter = np.zeros((picture_size, picture_size))
+        for i, lines in enumerate(all_lines): #iterate over all emitter positions
+            for j, line in enumerate(lines): #iterate over all detectors
+                for x, y in line: #add value from sinogram to every pixel of line
+                    picture[x][y] += sinogram[j][i]
+                    counter[x][y] += 1
+        for i in range(len(counter)):
+            for j in range(len(counter[i])):
+                if counter[i][j] != 0:
+                    picture[i][j] /= counter[i][j]
+        return picture
+
+    @staticmethod
     def show_rays(picture, all_lines):
         for line in all_lines:
             for i in range(len(picture)):
@@ -74,23 +90,29 @@ class Bresenham:
         return picture
 
     @staticmethod
-    def normalize_sinogram(sinogram):
-        maximum = np.amax(sinogram)
-        for i in range(len(sinogram)):
-            for j in range(len(sinogram[i])):
+    def normalize(data):
+        maximum = np.amax(data)
+        for i in range(len(data)):
+            for j in range(len(data[i])):
                 if maximum != 0:
-                    sinogram[i][j] = round(sinogram[i][j] / maximum * 255)
-        return sinogram
+                    data[i][j] = round(data[i][j] / maximum * 255)
+        return data
 
     @staticmethod
-    def algorithm(data, detectors_amount, picture):
-        all_lines = Bresenham.generate_all_lines(data, detectors_amount)
+    def algorithm(all_positions, detectors_amount, picture):
+        all_lines = Bresenham.generate_all_lines(all_positions)
         all_averages = Bresenham.generate_avgs_of_lines(all_lines, picture)
-        sinogram = np.ones((detectors_amount, len(data))) #sinogram will be matrix of size emiters_positions x detectors_amount
+        sinogram = np.ones((detectors_amount, len(all_positions))) #sinogram will be matrix of size emiters_positions x detectors_amount
         for x in range(len(all_averages)):
             for y in range(len(all_averages[x])):
                 sinogram[y][x] = all_averages[x][y]
 
-        sinogram = Bresenham.normalize_sinogram(sinogram)
+        sinogram = Bresenham.normalize(sinogram)
         #return self.show_rays(picture, all_lines)
         return sinogram
+
+    @staticmethod
+    def inverse_algorithm(all_positions, sinogram, picture_size):
+        all_lines = Bresenham.generate_all_lines(all_positions)
+        picture = Bresenham.generate_picture(all_lines, sinogram, picture_size)
+        return Bresenham.normalize(picture)

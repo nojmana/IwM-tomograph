@@ -3,6 +3,15 @@ import numpy as np
 import math
 
 
+class Position:
+    def __init__(self, detectors):
+        self.emitter_position = None
+        self.detectors = detectors
+
+    def set_emitter_position(self, emitter_position):
+        self.emitter_position = emitter_position
+
+
 class Transform:
     def __init__(self):
         self.alpha = 90
@@ -17,12 +26,12 @@ class Transform:
         radians = math.radians(self.alpha)
 
         #calculate all positions of emitter from 0 to 360 with alpha step
-        positions = []
+        emitter_positions = []
         for i in range(0, int(math.floor(360 / self.alpha))):
             x = round(r * math.cos(i * radians) + x0, 0)
             y = round(r * math.sin(i * radians) + y0, 0)
-            positions.append((int(x), int(y)))
-        return positions
+            emitter_positions.append((int(x), int(y)))
+        return emitter_positions
 
     def get_detectors_positions_for_current_angle(self, picture_size, angle):
         detectors_positions = []
@@ -42,13 +51,20 @@ class Transform:
     def make_sinogram(self, picture):
         picture_size = len(picture[0])
         emitter_positions = self.get_emitter_positions(picture_size)
-        all_detectors = []
-        for i in np.linspace(0.0, 360.0, len(emitter_positions), False):
-            all_detectors.append(self.get_detectors_positions_for_current_angle(picture_size, i))
-        #join all emiter positions and detectors
         all_positions = []
-        for i in range(len(emitter_positions)):
-            all_positions.append((emitter_positions[i], all_detectors[i]))
-        #b = Bresenham.Bresenham()
+        for i in np.linspace(0.0, 360.0, len(emitter_positions), False):
+            all_positions.append(Position(self.get_detectors_positions_for_current_angle(picture_size, i)))
+        for i in range(len(all_positions)):
+            all_positions[i].set_emitter_position(emitter_positions[i])
         sinogram = Bresenham.algorithm(all_positions, self.detectors_amount, picture)
         return sinogram
+
+    def restore_picture(self, sinogram, picture_size):
+        emitter_positions = self.get_emitter_positions(picture_size)
+        all_positions = []
+        for i in np.linspace(0.0, 360.0, len(emitter_positions), False):
+            all_positions.append(Position(self.get_detectors_positions_for_current_angle(picture_size, i)))
+        for i in range(len(all_positions)):
+            all_positions[i].set_emitter_position(emitter_positions[i])
+        picture = Bresenham.inverse_algorithm(all_positions, sinogram, picture_size)
+        return picture
