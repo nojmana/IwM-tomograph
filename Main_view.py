@@ -11,7 +11,7 @@ from skimage.color import rgb2gray
 class MainWindow(Frame):
     detectors_amount = 70
     alpha = 10
-    width = 360
+    width = 180
     slider_length = 300
 
     def __init__(self, root, file):
@@ -28,11 +28,12 @@ class MainWindow(Frame):
         self.pts_transformation = Pic_to_sin.Transform()
         self.pts_transformation.detectors_amount = MainWindow.detectors_amount
         self.pts_transformation.alpha = MainWindow.alpha
-        self.pts_transformation.width = MainWindow.width
+        self.pts_transformation.width = MainWindow.width * 2
 
         self.input_picture = rgb2gray(io.imread(file))
         self.display_picture(Image.fromarray(self.input_picture), 'input')
 
+        self.pts_transformation.generate_all_positions(self.input_picture)
         self.sinogram = self.pts_transformation.make_sinogram(self.input_picture)
         self.display_picture(Image.fromarray(self.sinogram), 'sinogram')
 
@@ -64,7 +65,7 @@ class MainWindow(Frame):
         alpha_label = Label(root, width=MainWindow.slider_length)
         alpha_label.place(x=75 * 2 + MainWindow.slider_length, y=100)
 
-        width_slider = Scale(root, from_=0, to=360, length=MainWindow.slider_length, orient='horizontal',
+        width_slider = Scale(root, from_=0, to=180, length=MainWindow.slider_length, orient='horizontal',
                              command=lambda value, name='width': self.change_parameters(name, value, width_label))
         width_slider.set(MainWindow.width)
         width_slider.place(x=200 + MainWindow.slider_length * 2, y=100)
@@ -107,18 +108,19 @@ class MainWindow(Frame):
 
     def change_parameters(self, parameter_type, value, label):
         if parameter_type == 'detectors':
-            self.pts_transformation.detectors_amount=int(value)
+            self.pts_transformation.detectors_amount = int(value)
             label.config(text="Detectors amount = " + value)
         elif parameter_type == 'alpha':
             label.config(text="Alpha = " + value)
-            self.pts_transformation.alpha=int(value)
+            self.pts_transformation.alpha = int(value)
         elif parameter_type == 'width':
             label.config(text="Width = " + value)
-            self.pts_transformation.width = int(value)
+            self.pts_transformation.width = int(value) * 2
         if self.var_checkbox.get():
             self.refresh()
 
     def refresh(self):
+        self.pts_transformation.generate_all_positions(self.input_picture)
         self.sinogram = self.pts_transformation.make_sinogram(self.input_picture)
         self.display_picture(Image.fromarray(self.sinogram), 'sinogram')
 
@@ -132,7 +134,6 @@ class MainWindow(Frame):
 
 
 if __name__ == '__main__':
-
     root = Tk()
     app = MainWindow(root, "pictures/01.png")
     root.mainloop()
