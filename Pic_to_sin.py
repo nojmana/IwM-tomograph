@@ -18,6 +18,7 @@ class Transform:
         self.detectors_amount = 2
         self.width = 180
         self.all_positions = []
+        self.progress = 5
 
     def generate_all_positions(self, picture):
         picture_size = len(picture[0])
@@ -60,7 +61,7 @@ class Transform:
         return detectors_positions
 
     def make_sinogram(self, picture):
-        sinogram = Bresenham.algorithm(self.all_positions, self.detectors_amount, picture)
+        sinogram = Bresenham.algorithm(self.all_positions, self.detectors_amount, picture, self.progress)
         return sinogram
 
     def restore_picture(self, sinogram, picture_size):

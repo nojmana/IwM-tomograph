@@ -13,6 +13,7 @@ class MainWindow(Frame):
     alpha = 10
     width = 180
     slider_length = 300
+    progress = 5
 
     def __init__(self, root, file):
         super().__init__()
@@ -54,23 +55,31 @@ class MainWindow(Frame):
                                  command=lambda value, name='detectors': self.change_parameters(name, value,
                                                                                                 detectors_label))
         detectors_slider.set(MainWindow.detectors_amount)
-        detectors_slider.place(x=100, y=100)
+        detectors_slider.place(x=100, y=200)
         detectors_label = Label(root, width=MainWindow.slider_length)
-        detectors_label.place(x=100, y=100)
+        detectors_label.place(x=100, y=200)
 
         alpha_slider = Scale(root, from_=1, to=180, length=MainWindow.slider_length, orient='horizontal',
                              command=lambda value, name='alpha': self.change_parameters(name, value, alpha_label))
         alpha_slider.set(MainWindow.alpha)
-        alpha_slider.place(x=75 * 2 + MainWindow.slider_length, y=100)
+        alpha_slider.place(x=75 * 2 + MainWindow.slider_length, y=200)
         alpha_label = Label(root, width=MainWindow.slider_length)
-        alpha_label.place(x=75 * 2 + MainWindow.slider_length, y=100)
+        alpha_label.place(x=75 * 2 + MainWindow.slider_length, y=200)
 
         width_slider = Scale(root, from_=0, to=180, length=MainWindow.slider_length, orient='horizontal',
                              command=lambda value, name='width': self.change_parameters(name, value, width_label))
         width_slider.set(MainWindow.width)
-        width_slider.place(x=200 + MainWindow.slider_length * 2, y=100)
+        width_slider.place(x=200 + MainWindow.slider_length * 2, y=200)
         width_label = Label(root, width=MainWindow.slider_length)
-        width_label.place(x=200 + MainWindow.slider_length * 2, y=100)
+        width_label.place(x=200 + MainWindow.slider_length * 2, y=200)
+
+        progress_slider = Scale(root, from_=1, to=5, length=MainWindow.slider_length, orient='horizontal',
+                                 command=lambda value, name='progress': self.change_parameters(name, value,
+                                                                                                progress_label))
+        progress_slider.set(MainWindow.progress)
+        progress_slider.place(x=450, y=100)
+        progress_label = Label(root, width=MainWindow.slider_length)
+        progress_label.place(x=450, y=100)
 
     def center_window(self):
         w = 1200
@@ -82,7 +91,8 @@ class MainWindow(Frame):
 
     def browse(self):
         file = filedialog.askopenfilename()
-        self.load_images(file)
+        if len(file) > 0:
+            self.load_images(file)
 
     def auto_refresh(self):
         if self.var_checkbox.get():
@@ -100,11 +110,11 @@ class MainWindow(Frame):
         label = Label(self, image=resized_picture)
         label.image = resized_picture
         if picture_type == 'input':
-            label.place(x=100, y=200)
+            label.place(x=100, y=300)
         elif picture_type == 'sinogram':
-            label.place(x=450, y=200)
+            label.place(x=450, y=300)
         elif picture_type == 'output':
-            label.place(x=800, y=200)
+            label.place(x=800, y=300)
 
     def change_parameters(self, parameter_type, value, label):
         if parameter_type == 'detectors':
@@ -116,6 +126,10 @@ class MainWindow(Frame):
         elif parameter_type == 'width':
             label.config(text="Width = " + value)
             self.pts_transformation.width = int(value) * 2
+        elif parameter_type == 'progress':
+            percent = int(int(value)/5 * 100)
+            label.config(text="Progress = " + str(percent) + "%")
+            self.pts_transformation.progress = int(value)
         if self.var_checkbox.get():
             self.refresh()
 

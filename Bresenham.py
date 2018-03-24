@@ -1,8 +1,9 @@
 import numpy as np
 from skimage import filters
+from Main_view import MainWindow
 
 
-class Bresenham:
+class Bresenham(MainWindow):
     @staticmethod
     def generate_line(x1, y1, x2, y2):
         kx = 1 if x1 <= x2 else -1
@@ -50,11 +51,11 @@ class Bresenham:
     @staticmethod
     def generate_avgs_of_lines(all_lines, picture):
         all_avgs = []
-        for lines in all_lines: # iterate over all emitter positions
+        for lines in all_lines:  # iterate over all emitter positions
             avg = []
-            for line in lines: # iterate over all detectors
+            for line in lines:  # iterate over all detectors
                 avg_temp = 0
-                for x, y in line: # calculate avg for line from emitter position to detector position
+                for x, y in line:  # calculate avg for line from emitter position to detector position
                     avg_temp = avg_temp + picture[x][y]
                 avg_temp = avg_temp
                 avg.append(avg_temp)
@@ -65,10 +66,11 @@ class Bresenham:
     def generate_picture(all_lines, sinogram, picture_size):
         picture = np.ones((picture_size, picture_size))
         counter = np.zeros((picture_size, picture_size))
-        for i, lines in enumerate(all_lines): # iterate over all emitter positions
-            for j, line in enumerate(lines): # iterate over all detectors
-                for x, y in line: # add value from sinogram to every pixel of line
+        for i, lines in enumerate(all_lines):  # iterate over all emitter positions
+            for j, line in enumerate(lines):  # iterate over all detectors
+                for x, y in line:  # add value from sinogram to every pixel of line
                     picture[x][y] += sinogram[j][i]
+                    counter[x][y] += 1
         for i in range(len(counter)):
             for j in range(len(counter[i])):
                 if counter[i][j] != 0:
@@ -81,11 +83,11 @@ class Bresenham:
             for i in range(len(picture)):
                 for j in range(len(picture)):
                         picture[i][j] = 0
-                for i in range(len(line)):
-                    for j in range(len(line[i])):
-                        x = line[i][j][0]
-                        y = line[i][j][1]
-                        picture[x][y] = 255
+            for i in range(len(line)):
+                for j in range(len(line[i])):
+                    x = line[i][j][0]
+                    y = line[i][j][1]
+                    picture[x][y] = 255
         return picture
 
     @staticmethod
@@ -99,24 +101,25 @@ class Bresenham:
 
     @staticmethod
     def filter_normalize(img, perc=1):
-        max = np.percentile(img, 100-perc)
-        min = np.percentile(img, perc)
-        norm = (img - min) / (max - min)
-        norm[norm[:,:] > 255] = 255
-        norm[norm[:,:] < 0] = 0
+        maximum = np.percentile(img, 100-perc)
+        minimum = np.percentile(img, perc)
+        norm = (img - minimum) / (maximum - minimum)
+        norm[norm[:, :] > 255] = 255
+        norm[norm[:, :] < 0] = 0
         return norm
 
     @staticmethod
-    def algorithm(all_positions, detectors_amount, picture):
+    def algorithm(all_positions, detectors_amount, picture, progress):
         all_lines = Bresenham.generate_all_lines(all_positions)
         all_averages = Bresenham.generate_avgs_of_lines(all_lines, picture)
-        sinogram = np.ones((detectors_amount, len(all_positions))) # sinogram will be matrix of size emiters_positions x detectors_amount
+        sinogram = np.ones((detectors_amount, len(all_positions)))  # sinogram will be matrix of size emiters_positions x detectors_amount
         for x in range(len(all_averages)):
             for y in range(len(all_averages[x])):
                 sinogram[y][x] = all_averages[x][y]
-
+            if x/len(all_averages) >= progress/5:
+                break
         sinogram = Bresenham.normalize(sinogram)
-        # return self.show_rays(picture, all_lines)
+        #return Bresenham.show_rays(picture, all_lines)
         return sinogram
 
     @staticmethod
