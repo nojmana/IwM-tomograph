@@ -69,6 +69,7 @@ class Bresenham:
             for j, line in enumerate(lines): # iterate over all detectors
                 for x, y in line: # add value from sinogram to every pixel of line
                     picture[x][y] += sinogram[j][i]
+                    counter[x][y] += 1
         for i in range(len(counter)):
             for j in range(len(counter[i])):
                 if counter[i][j] != 0:
