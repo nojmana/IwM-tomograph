@@ -107,10 +107,13 @@ class Bresenham(MainWindow):
     def filter_normalize(img, perc=1):
         maximum = np.percentile(img, 100-perc)
         minimum = np.percentile(img, perc)
-        norm = (img - minimum) / (maximum - minimum)
-        norm[norm[:, :] > 255] = 255
-        norm[norm[:, :] < 0] = 0
-        return norm
+        if maximum - minimum != 0:
+            norm = (img - minimum) / (maximum - minimum)
+            norm[norm[:, :] > 255] = 255
+            norm[norm[:, :] < 0] = 0
+            return norm
+        else:
+            return img
 
     @staticmethod
     def algorithm(all_lines, all_positions, detectors_amount, picture, progress):
