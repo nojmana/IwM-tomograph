@@ -20,11 +20,13 @@ class MainWindow(Frame):
         super().__init__()
         self.root = root
 
-        self.var_checkbox = IntVar()
+        self.var_refresh_checkbox = IntVar()
+        self.var_iter_checkbox = IntVar()
         self.quit_button = Button(self, text="Quit", command=self.quit)
         self.browse_button = Button(self, text="Browse file", command=self.browse)
         self.refresh_button = Button(self, text="Refresh", command=self.refresh)
-        self.checkbox = Checkbutton(self, text="Auto-refresh", variable=self.var_checkbox, command=self.auto_refresh)
+        self.refresh_checkbox = Checkbutton(self, text="Auto-refresh", variable=self.var_refresh_checkbox, command=self.auto_refresh)
+        self.iter_checkbox = Checkbutton(self, text="Auto-iteration", variable=self.var_iter_checkbox, command=self.auto_refresh)
         self.init_ui()
 
         self.pts_transformation = Pic_to_sin.Transform()
@@ -47,7 +49,8 @@ class MainWindow(Frame):
         self.quit_button.place(x=1100, y=20)
         self.browse_button.place(x=1000, y=20)
         self.refresh_button.place(x=900, y=20)
-        self.checkbox.place(x=790, y=20)
+        self.refresh_checkbox.place(x=790, y=20)
+        self.iter_checkbox.place(x=670, y=20)
 
         detectors_slider = Scale(root, from_=1, to=100, length=MainWindow.slider_length, orient='horizontal',
                                  command=lambda value, name='detectors': self.change_parameters(name, value,
@@ -93,7 +96,7 @@ class MainWindow(Frame):
             self.load_images(file)
 
     def auto_refresh(self):
-        if self.var_checkbox.get():
+        if self.var_refresh_checkbox.get():
             self.refresh()
             self.refresh_button['state'] = 'disabled'
         else:
@@ -128,19 +131,19 @@ class MainWindow(Frame):
             percent = int(int(value)/5 * 100)
             label.config(text="Progress = " + str(percent) + "%")
             self.pts_transformation.progress = int(value)
-        if self.var_checkbox.get():
+        if self.var_refresh_checkbox.get():
             self.refresh()
 
     def refresh(self):
         self.pts_transformation.generate_all_positions(self.input_picture)
-        if MainWindow.type == 0:
+        if self.var_iter_checkbox.get():
+            self.generate_iter()
+        else:
             self.sinogram = self.pts_transformation.make_sinogram(self.input_picture)
             self.display_picture(Image.fromarray(self.sinogram), 'sinogram')
 
             self.restored_picture = self.pts_transformation.restore_picture(self.sinogram, len(self.input_picture))
             self.display_picture(Image.fromarray(self.restored_picture), 'output')
-        else:
-            self.generate_iter()
 
     def generate_iter(self):
         self.sinogram, is_end = self.pts_transformation.make_sinogram_iter(self.input_picture)
