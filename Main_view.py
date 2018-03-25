@@ -1,4 +1,6 @@
+from Analysis import Analysis
 import Pic_to_sin
+import numpy as np
 
 from tkinter import *
 from tkinter import filedialog
@@ -21,6 +23,9 @@ class MainWindow(Frame):
 
         self.var_refresh_checkbox = IntVar()
         self.var_iter_checkbox = IntVar()
+        self.test_alpha_button = Button(self, text="Alpha test", command=self.test_alpha)
+        self.test_detectors_button = Button(self, text="Detectors test", command=self.test_detectors)
+        self.test_width_button = Button(self, text="Width test", command=self.test_width)
         self.quit_button = Button(self, text="Quit", command=self.quit)
         self.browse_button = Button(self, text="Browse file", command=self.browse)
         self.refresh_button = Button(self, text="Refresh", command=self.refresh)
@@ -45,6 +50,9 @@ class MainWindow(Frame):
         self.pack(fill=BOTH, expand=1)
         self.center_window()
 
+        self.test_alpha_button.place(x=100, y=20)
+        self.test_detectors_button.place(x=210, y=20)
+        self.test_width_button.place(x=320, y=20)
         self.quit_button.place(x=1100, y=20)
         self.browse_button.place(x=1000, y=20)
         self.refresh_button.place(x=900, y=20)
@@ -81,9 +89,57 @@ class MainWindow(Frame):
         progress_label = Label(root, width=MainWindow.slider_length)
         progress_label.place(x=450, y=100)
 
+    def test_alpha(self):
+        alphas = np.arange(2, 91, 2)
+        x = []
+        y = []
+        self.pts_transformation.detectors_amount = 99
+        self.pts_transformation.width = 180*2
+        for i in alphas:
+            self.pts_transformation.alpha = i
+            self.refresh()
+            mse = Analysis.mean_squared_error(self.input_picture, self.restored_picture)
+            print("Alpha =", i, "error =", mse)
+            self.root.update_idletasks()
+            x.append(i)
+            y.append(mse)
+        Analysis.draw_plot(x, y, "Kąt α [°]", "Błąd średniokwadratowy", "alpha")
+
+    def test_detectors(self):
+        detectors = np.arange(3, 102, 4)
+        x = []
+        y = []
+        self.pts_transformation.alpha = 2
+        self.pts_transformation.width = 180*2
+        for i in detectors:
+            self.pts_transformation.detectors_amount = i
+            self.refresh()
+            mse = Analysis.mean_squared_error(self.input_picture, self.restored_picture)
+            print("Detectors =", i, "error =", mse)
+            self.root.update_idletasks()
+            x.append(i)
+            y.append(mse)
+        Analysis.draw_plot(x, y, "Liczba detektorów", "Błąd średniokwadratowy", "detectors")
+
+    def test_width(self):
+        widths = np.arange(5, 181, 5)
+        x = []
+        y = []
+        self.pts_transformation.alpha = 2
+        self.pts_transformation.detectors_amount = 99
+        for i in widths:
+            self.pts_transformation.width = i*2
+            self.refresh()
+            mse = Analysis.mean_squared_error(self.input_picture, self.restored_picture)
+            print("Width =", i, "error =", mse)
+            self.root.update_idletasks()
+            x.append(i)
+            y.append(mse)
+        Analysis.draw_plot(x, y, "Kąt rozwarcia stożka [°]", "Błąd średniokwadratowy", "width")
+
     def center_window(self):
         w = 1200
-        h = 800
+        h = 700
 
         x = (self.master.winfo_screenwidth() - w) / 2
         y = (self.master.winfo_screenheight() - h) / 2
@@ -162,5 +218,5 @@ class MainWindow(Frame):
 
 if __name__ == '__main__':
     root = Tk()
-    app = MainWindow(root, "pictures/01.png")
+    app = MainWindow(root, "pictures/03.png")
     root.mainloop()

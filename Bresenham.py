@@ -146,7 +146,7 @@ class Bresenham(MainWindow):
     @staticmethod
     def inverse_algorithm(all_lines, sinogram, picture_size):
         picture = Bresenham.generate_picture(all_lines, sinogram, picture_size)
-        picture = picture ** 1.3
+        picture = picture ** 2.8
         picture = filters.gaussian(picture, sigma=1)
         picture = Bresenham.filter_normalize(picture, perc=20)
         picture = Bresenham.normalize(picture)
