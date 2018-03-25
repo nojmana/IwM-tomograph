@@ -14,7 +14,6 @@ class MainWindow(Frame):
     width = 180
     slider_length = 300
     progress = 5
-    type = 0 # 0 not iter, 1 iter
 
     def __init__(self, root, file):
         super().__init__()

@@ -113,8 +113,7 @@ class Bresenham(MainWindow):
         return norm
 
     @staticmethod
-    def algorithm(all_positions, detectors_amount, picture, progress):
-        all_lines = Bresenham.generate_all_lines(all_positions)
+    def algorithm(all_lines, all_positions, detectors_amount, picture, progress):
         all_averages = Bresenham.generate_avgs_of_lines(all_lines, picture)
         sinogram = np.ones((detectors_amount, len(all_positions)))  # matrix of size emiters_positions x detectors_amount
         for x in range(len(all_averages)):
@@ -123,13 +122,12 @@ class Bresenham(MainWindow):
             if x/len(all_averages) >= progress/5:
                 break
         sinogram = Bresenham.normalize(sinogram)
-        #return Bresenham.show_rays(picture, all_lines)
+        # return Bresenham.show_rays(picture, all_lines)
         return sinogram
 
     @staticmethod
-    def algorithm_iter(all_positions, detectors_amount, picture):
+    def algorithm_iter(all_lines, all_positions, detectors_amount, picture):
         if Bresenham.iter == 0:
-            all_lines = Bresenham.generate_all_lines(all_positions)
             Bresenham.all_averages = Bresenham.generate_avgs_of_lines(all_lines, picture)
             Bresenham.iter_sinogram = np.ones(
                 (detectors_amount, len(all_positions)))  # matrix of size emiters_positions x detectors_amount
@@ -146,8 +144,7 @@ class Bresenham(MainWindow):
         return sinogram, Bresenham.iter == 0
 
     @staticmethod
-    def inverse_algorithm(all_positions, sinogram, picture_size):
-        all_lines = Bresenham.generate_all_lines(all_positions)
+    def inverse_algorithm(all_lines, sinogram, picture_size):
         picture = Bresenham.generate_picture(all_lines, sinogram, picture_size)
         picture = picture ** 1.3
         picture = filters.gaussian(picture, sigma=1)

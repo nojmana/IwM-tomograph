@@ -18,6 +18,7 @@ class Transform:
         self.detectors_amount = 2
         self.width = 180
         self.all_positions = []
+        self.all_lines = []
         self.progress = 5
 
     def generate_all_positions(self, picture):
@@ -29,6 +30,7 @@ class Transform:
         for i in range(len(all_positions)):
             all_positions[i].set_emitter_position(emitter_positions[i])
         self.all_positions = all_positions
+        self.all_lines = Bresenham.generate_all_lines(all_positions)
 
     def get_emitter_positions(self, picture_size):
         # calculate center and radius of the circle
@@ -61,13 +63,13 @@ class Transform:
         return detectors_positions
 
     def make_sinogram_iter(self, picture):
-        sinogram, is_end = Bresenham.algorithm_iter(self.all_positions, self.detectors_amount, picture)
+        sinogram, is_end = Bresenham.algorithm_iter(self.all_lines, self.all_positions, self.detectors_amount, picture)
         return sinogram, is_end
 
     def make_sinogram(self, picture):
-        sinogram = Bresenham.algorithm(self.all_positions, self.detectors_amount, picture, self.progress)
+        sinogram = Bresenham.algorithm(self.all_lines, self.all_positions, self.detectors_amount, picture, self.progress)
         return sinogram
 
     def restore_picture(self, sinogram, picture_size):
-        picture = Bresenham.inverse_algorithm(self.all_positions, sinogram, picture_size)
+        picture = Bresenham.inverse_algorithm(self.all_lines, sinogram, picture_size)
         return picture
