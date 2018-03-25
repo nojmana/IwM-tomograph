@@ -4,6 +4,10 @@ from Main_view import MainWindow
 
 
 class Bresenham(MainWindow):
+    iter = 0
+    iter_sinogram = None
+    all_averages = None
+
     @staticmethod
     def generate_line(x1, y1, x2, y2):
         kx = 1 if x1 <= x2 else -1
@@ -112,7 +116,7 @@ class Bresenham(MainWindow):
     def algorithm(all_positions, detectors_amount, picture, progress):
         all_lines = Bresenham.generate_all_lines(all_positions)
         all_averages = Bresenham.generate_avgs_of_lines(all_lines, picture)
-        sinogram = np.ones((detectors_amount, len(all_positions)))  # sinogram will be matrix of size emiters_positions x detectors_amount
+        sinogram = np.ones((detectors_amount, len(all_positions)))  # matrix of size emiters_positions x detectors_amount
         for x in range(len(all_averages)):
             for y in range(len(all_averages[x])):
                 sinogram[y][x] = all_averages[x][y]
@@ -121,6 +125,26 @@ class Bresenham(MainWindow):
         sinogram = Bresenham.normalize(sinogram)
         #return Bresenham.show_rays(picture, all_lines)
         return sinogram
+
+    @staticmethod
+    def algorithm_iter(all_positions, detectors_amount, picture):
+        if Bresenham.iter == 0:
+            all_lines = Bresenham.generate_all_lines(all_positions)
+            Bresenham.all_averages = Bresenham.generate_avgs_of_lines(all_lines, picture)
+            Bresenham.iter_sinogram = np.ones(
+                (detectors_amount, len(all_positions)))  # matrix of size emiters_positions x detectors_amount
+            for y in range(len(Bresenham.all_averages[Bresenham.iter])):
+                Bresenham.iter_sinogram[y][Bresenham.iter] = Bresenham.all_averages[Bresenham.iter][y]
+            Bresenham.iter += 1
+        elif Bresenham.iter < len(Bresenham.all_averages):
+            for y in range(len(Bresenham.all_averages[Bresenham.iter])):
+                Bresenham.iter_sinogram[y][Bresenham.iter] = Bresenham.all_averages[Bresenham.iter][y]
+            Bresenham.iter += 1
+        else:
+            Bresenham.iter = 0
+        sinogram = Bresenham.normalize(Bresenham.iter_sinogram)
+        # return Bresenham.show_rays(picture, all_lines)
+        return sinogram, Bresenham.iter == 0
 
     @staticmethod
     def inverse_algorithm(all_positions, sinogram, picture_size):

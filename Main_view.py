@@ -34,12 +34,15 @@ class MainWindow(Frame):
         self.input_picture = rgb2gray(io.imread(file))
         self.display_picture(Image.fromarray(self.input_picture), 'input')
 
-        self.pts_transformation.generate_all_positions(self.input_picture)
-        self.sinogram = self.pts_transformation.make_sinogram(self.input_picture)
-        self.display_picture(Image.fromarray(self.sinogram), 'sinogram')
+        self.sinogram = None
+        self.restored_picture = None
+        self.refresh()
+        # self.pts_transformation.generate_all_positions(self.input_picture)
+        # self.sinogram = self.pts_transformation.make_sinogram(self.input_picture)
+        # self.display_picture(Image.fromarray(self.sinogram), 'sinogram')
 
-        self.restored_picture = self.pts_transformation.restore_picture(self.sinogram, len(self.input_picture))
-        self.display_picture(Image.fromarray(self.restored_picture), 'output')
+        # self.restored_picture = self.pts_transformation.restore_picture(self.sinogram, len(self.input_picture))
+        # self.display_picture(Image.fromarray(self.restored_picture), 'output')
 
     def init_ui(self):
         self.master.title("Tomograph")
@@ -135,11 +138,17 @@ class MainWindow(Frame):
 
     def refresh(self):
         self.pts_transformation.generate_all_positions(self.input_picture)
-        self.sinogram = self.pts_transformation.make_sinogram(self.input_picture)
+        self.generate_iter()
+
+    def generate_iter(self):
+        self.sinogram, is_end = self.pts_transformation.make_sinogram(self.input_picture)
         self.display_picture(Image.fromarray(self.sinogram), 'sinogram')
 
         self.restored_picture = self.pts_transformation.restore_picture(self.sinogram, len(self.input_picture))
         self.display_picture(Image.fromarray(self.restored_picture), 'output')
+        if not is_end:
+            self.root.update_idletasks()
+            self.root.after(0, self.generate_iter)
 
     def load_images(self, file):
         self.input_picture = rgb2gray(io.imread(file))
