@@ -14,6 +14,7 @@ class MainWindow(Frame):
     width = 180
     slider_length = 300
     progress = 5
+    type = 0 # 0 not iter, 1 iter
 
     def __init__(self, root, file):
         super().__init__()
@@ -37,12 +38,6 @@ class MainWindow(Frame):
         self.sinogram = None
         self.restored_picture = None
         self.refresh()
-        # self.pts_transformation.generate_all_positions(self.input_picture)
-        # self.sinogram = self.pts_transformation.make_sinogram(self.input_picture)
-        # self.display_picture(Image.fromarray(self.sinogram), 'sinogram')
-
-        # self.restored_picture = self.pts_transformation.restore_picture(self.sinogram, len(self.input_picture))
-        # self.display_picture(Image.fromarray(self.restored_picture), 'output')
 
     def init_ui(self):
         self.master.title("Tomograph")
@@ -138,10 +133,17 @@ class MainWindow(Frame):
 
     def refresh(self):
         self.pts_transformation.generate_all_positions(self.input_picture)
-        self.generate_iter()
+        if MainWindow.type == 0:
+            self.sinogram = self.pts_transformation.make_sinogram(self.input_picture)
+            self.display_picture(Image.fromarray(self.sinogram), 'sinogram')
+
+            self.restored_picture = self.pts_transformation.restore_picture(self.sinogram, len(self.input_picture))
+            self.display_picture(Image.fromarray(self.restored_picture), 'output')
+        else:
+            self.generate_iter()
 
     def generate_iter(self):
-        self.sinogram, is_end = self.pts_transformation.make_sinogram(self.input_picture)
+        self.sinogram, is_end = self.pts_transformation.make_sinogram_iter(self.input_picture)
         self.display_picture(Image.fromarray(self.sinogram), 'sinogram')
 
         self.restored_picture = self.pts_transformation.restore_picture(self.sinogram, len(self.input_picture))

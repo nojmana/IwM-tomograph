@@ -60,11 +60,13 @@ class Transform:
             detectors_positions.append((int(x), int(y)))
         return detectors_positions
 
-    def make_sinogram(self, picture):
-        # sinogram = Bresenham.algorithm(self.all_positions, self.detectors_amount, picture, self.progress)
-        # return sinogram
+    def make_sinogram_iter(self, picture):
         sinogram, is_end = Bresenham.algorithm_iter(self.all_positions, self.detectors_amount, picture)
         return sinogram, is_end
+
+    def make_sinogram(self, picture):
+        sinogram = Bresenham.algorithm(self.all_positions, self.detectors_amount, picture, self.progress)
+        return sinogram
 
     def restore_picture(self, sinogram, picture_size):
         picture = Bresenham.inverse_algorithm(self.all_positions, sinogram, picture_size)

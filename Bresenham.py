@@ -142,8 +142,7 @@ class Bresenham(MainWindow):
             Bresenham.iter += 1
         else:
             Bresenham.iter = 0
-        sinogram = Bresenham.normalize(Bresenham.iter_sinogram)
-        # return Bresenham.show_rays(picture, all_lines)
+        sinogram = Bresenham.normalize(np.copy(Bresenham.iter_sinogram))
         return sinogram, Bresenham.iter == 0
 
     @staticmethod
