@@ -13,8 +13,15 @@ class Analysis:
         plt.plot(x, y)
         ax = plt.subplot(111)
         ax.set_xlim([0, max(x)])
-        ax.set_ylim([0.95*min(y), 1.05*max(y)])
+        ax.set_ylim([0.9*min(y), 1.05*max(y)])
         ax.grid(linestyle='dashed')
         plt.xlabel(xlabel)
         plt.ylabel(ylabel)
         plt.savefig(name + ".png", bbox_inches='tight')
+
+
+class FilterProps:
+
+    def __init__(self, gamma, gauss):
+        self.gamma = gamma
+        self.gauss = gauss

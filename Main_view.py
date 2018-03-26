@@ -1,4 +1,5 @@
 from Analysis import Analysis
+from Analysis import FilterProps
 import Pic_to_sin
 import numpy as np
 
@@ -23,9 +24,14 @@ class MainWindow(Frame):
 
         self.var_refresh_checkbox = IntVar()
         self.var_iter_checkbox = IntVar()
+
+        self.filter_props = FilterProps(gamma=2.4, gauss=1)
         self.test_alpha_button = Button(self, text="Alpha test", command=self.test_alpha)
         self.test_detectors_button = Button(self, text="Detectors test", command=self.test_detectors)
         self.test_width_button = Button(self, text="Width test", command=self.test_width)
+        self.test_gamma_button = Button(self, text="Gamma test", command=self.test_gamma)
+        self.test_gauss_button = Button(self, text="Gauss test", command=self.test_gauss)
+
         self.quit_button = Button(self, text="Quit", command=self.quit)
         self.browse_button = Button(self, text="Browse file", command=self.browse)
         self.refresh_button = Button(self, text="Refresh", command=self.refresh)
@@ -51,8 +57,11 @@ class MainWindow(Frame):
         self.center_window()
 
         self.test_alpha_button.place(x=100, y=20)
-        self.test_detectors_button.place(x=210, y=20)
-        self.test_width_button.place(x=320, y=20)
+        self.test_detectors_button.place(x=196, y=20)
+        self.test_width_button.place(x=300, y=20)
+        self.test_gamma_button.place(x=100, y=50)
+        self.test_gauss_button.place(x=199, y=50)
+
         self.quit_button.place(x=1100, y=20)
         self.browse_button.place(x=1000, y=20)
         self.refresh_button.place(x=900, y=20)
@@ -137,6 +146,42 @@ class MainWindow(Frame):
             y.append(mse)
         Analysis.draw_plot(x, y, "Kąt rozwarcia stożka [°]", "Błąd średniokwadratowy", "width")
 
+    def test_gamma(self):
+        gammas = np.arange(0.2, 4.1, 0.2)
+        x = []
+        y = []
+        self.pts_transformation.alpha = 2
+        self.pts_transformation.detectors_amount = 99
+        self.pts_transformation.width = 180 * 2
+        for i in gammas:
+            self.filter_props.gamma = i
+            self.refresh()
+            mse = Analysis.mean_squared_error(self.input_picture, self.restored_picture)
+            print("Gamma =", i, "error =", mse)
+            self.root.update_idletasks()
+            x.append(i)
+            y.append(mse)
+        Analysis.draw_plot(x, y, "Wartość γ", "Błąd średniokwadratowy", "gamma")
+
+    def test_gauss(self):
+        gauss = np.arange(0, 3.1, 0.1)
+        x = []
+        y = []
+        self.pts_transformation.alpha = 2
+        self.pts_transformation.detectors_amount = 99
+        self.pts_transformation.width = 180 * 2
+        self.filter_props.gamma = 2.4
+        for i in gauss:
+            self.filter_props.gauss = i
+            self.refresh()
+            mse = Analysis.mean_squared_error(self.input_picture, self.restored_picture)
+            print("Gauss =", i, "error =", mse)
+            self.root.update_idletasks()
+            x.append(i)
+            y.append(mse)
+        Analysis.draw_plot(x, y, "Odchylenie standardowe", "Błąd średniokwadratowy", "gauss")
+        # odchylenie standardowe rozkładu normalnego, który został użyty do generacji maski
+
     def center_window(self):
         w = 1200
         h = 700
@@ -197,14 +242,16 @@ class MainWindow(Frame):
             self.sinogram = self.pts_transformation.make_sinogram(self.input_picture)
             self.display_picture(Image.fromarray(self.sinogram), 'sinogram')
 
-            self.restored_picture = self.pts_transformation.restore_picture(self.sinogram, len(self.input_picture))
+            self.restored_picture = self.pts_transformation.restore_picture(self.sinogram, len(self.input_picture),
+                                                                            self.filter_props)
             self.display_picture(Image.fromarray(self.restored_picture), 'output')
 
     def generate_iter(self):
         self.sinogram, is_end = self.pts_transformation.make_sinogram_iter(self.input_picture)
         self.display_picture(Image.fromarray(self.sinogram), 'sinogram')
 
-        self.restored_picture = self.pts_transformation.restore_picture(self.sinogram, len(self.input_picture))
+        self.restored_picture = self.pts_transformation.restore_picture(self.sinogram, len(self.input_picture),
+                                                                        self.filter_props)
         self.display_picture(Image.fromarray(self.restored_picture), 'output')
         if not is_end:
             self.root.update_idletasks()

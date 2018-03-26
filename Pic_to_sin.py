@@ -70,6 +70,6 @@ class Transform:
         sinogram = Bresenham.algorithm(self.all_lines, self.all_positions, self.detectors_amount, picture, self.progress)
         return sinogram
 
-    def restore_picture(self, sinogram, picture_size):
-        picture = Bresenham.inverse_algorithm(self.all_lines, sinogram, picture_size)
+    def restore_picture(self, sinogram, picture_size, filter_props):
+        picture = Bresenham.inverse_algorithm(self.all_lines, sinogram, picture_size, filter_props)
         return picture

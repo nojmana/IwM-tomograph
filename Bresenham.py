@@ -103,14 +103,15 @@ class Bresenham(MainWindow):
                     data[i][j] = round(data[i][j] / maximum * 255)
         return data
 
-    @staticmethod
-    def filter_normalize(img, perc=1):
+    """"@staticmethod
+    def filter_normalize(img, perc):
         maximum = np.percentile(img, 100-perc)
         minimum = np.percentile(img, perc)
         norm = (img - minimum) / (maximum - minimum)
         norm[norm[:, :] > 255] = 255
         norm[norm[:, :] < 0] = 0
-        return norm
+        print("MSE:", Analysis.mean_squared_error(img, norm))
+        return norm"""
 
     @staticmethod
     def algorithm(all_lines, all_positions, detectors_amount, picture, progress):
@@ -144,10 +145,9 @@ class Bresenham(MainWindow):
         return sinogram, Bresenham.iter == 0
 
     @staticmethod
-    def inverse_algorithm(all_lines, sinogram, picture_size):
+    def inverse_algorithm(all_lines, sinogram, picture_size, filter_props):
         picture = Bresenham.generate_picture(all_lines, sinogram, picture_size)
-        picture = picture ** 2.8
-        picture = filters.gaussian(picture, sigma=1)
-        picture = Bresenham.filter_normalize(picture, perc=20)
+        picture = picture ** filter_props.gamma
+        picture = filters.gaussian(picture, sigma=filter_props.gauss)
         picture = Bresenham.normalize(picture)
         return picture
