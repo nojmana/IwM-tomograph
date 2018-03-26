@@ -103,16 +103,6 @@ class Bresenham(MainWindow):
                     data[i][j] = round(data[i][j] / maximum * 255)
         return data
 
-    """"@staticmethod
-    def filter_normalize(img, perc):
-        maximum = np.percentile(img, 100-perc)
-        minimum = np.percentile(img, perc)
-        norm = (img - minimum) / (maximum - minimum)
-        norm[norm[:, :] > 255] = 255
-        norm[norm[:, :] < 0] = 0
-        print("MSE:", Analysis.mean_squared_error(img, norm))
-        return norm"""
-
     @staticmethod
     def algorithm(all_lines, all_positions, detectors_amount, picture, progress):
         all_averages = Bresenham.generate_avgs_of_lines(all_lines, picture)
