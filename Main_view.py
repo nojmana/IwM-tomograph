@@ -31,6 +31,7 @@ class MainWindow(Frame):
         self.test_width_button = Button(self, text="Width test", command=self.test_width)
         self.test_gamma_button = Button(self, text="Gamma test", command=self.test_gamma)
         self.test_gauss_button = Button(self, text="Gauss test", command=self.test_gauss)
+        self.test_iter_button = Button(self, text="Iter test", command=self.test_iter)
 
         self.quit_button = Button(self, text="Quit", command=self.quit)
         self.browse_button = Button(self, text="Browse file", command=self.browse)
@@ -61,6 +62,7 @@ class MainWindow(Frame):
         self.test_width_button.place(x=300, y=20)
         self.test_gamma_button.place(x=100, y=50)
         self.test_gauss_button.place(x=199, y=50)
+        self.test_iter_button.place(x=300, y=50)
 
         self.quit_button.place(x=1100, y=20)
         self.browse_button.place(x=1000, y=20)
@@ -181,6 +183,34 @@ class MainWindow(Frame):
             y.append(mse)
         Analysis.draw_plot(x, y, "Odchylenie standardowe", "Błąd średniokwadratowy", "gauss")
         # odchylenie standardowe rozkładu normalnego, który został użyty do generacji maski
+
+    def test_iter(self):
+        x = []
+        y = []
+        self.var_iter_checkbox.set(True)
+        self.pts_transformation.alpha = 2
+        self.pts_transformation.detectors_amount = 99
+        self.pts_transformation.width = 180 * 2
+        self.filter_props.gamma = 2.4
+        self.filter_props.gauss = 1.0
+
+        is_end = False
+        i = 0
+        while not is_end:
+            self.sinogram, is_end = self.pts_transformation.make_sinogram_iter(self.input_picture)
+            self.display_picture(Image.fromarray(self.sinogram), 'sinogram')
+
+            self.restored_picture = self.pts_transformation.restore_picture(self.sinogram, len(self.input_picture),
+                                                                        self.filter_props)
+            self.display_picture(Image.fromarray(self.restored_picture), 'output')
+            self.root.update_idletasks()
+
+            mse = Analysis.mean_squared_error(self.input_picture, self.restored_picture)
+            x.append(i)
+            y.append(mse)
+            i += 1
+            print("Iter =", i, "error =", mse)
+        Analysis.draw_plot(x, y, "Iteracja", "Błąd średniokwadratowy", "iter")
 
     def center_window(self):
         w = 1200
