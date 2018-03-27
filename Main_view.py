@@ -188,11 +188,13 @@ class MainWindow(Frame):
         x = []
         y = []
         self.var_iter_checkbox.set(True)
+
         self.pts_transformation.alpha = 2
         self.pts_transformation.detectors_amount = 99
         self.pts_transformation.width = 180 * 2
         self.filter_props.gamma = 2.4
         self.filter_props.gauss = 1.0
+        self.pts_transformation.generate_all_positions(self.input_picture)
 
         is_end = False
         i = 0
